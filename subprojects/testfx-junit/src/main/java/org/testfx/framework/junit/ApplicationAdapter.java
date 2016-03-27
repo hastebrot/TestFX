@@ -14,41 +14,28 @@
  * CONDITIONS OF ANY KIND, either express or implied. See the Licence for the
  * specific language governing permissions and limitations under the Licence.
  */
-package org.testfx.service.query.impl;
+package org.testfx.framework.junit;
 
-import javafx.geometry.Bounds;
-import javafx.geometry.Point2D;
+import javafx.application.Application;
+import javafx.stage.Stage;
 
 import org.testfx.api.annotation.Unstable;
-import org.testfx.util.PointQueryUtils;
 
-@Unstable
-public class BoundsPointQuery extends PointQueryBase {
+@Unstable(reason = "needs more tests")
+public final class ApplicationAdapter extends Application {
 
     //---------------------------------------------------------------------------------------------
     // PRIVATE FIELDS.
     //---------------------------------------------------------------------------------------------
 
-    private Bounds bounds;
+    private ApplicationFixture applicationFixture;
 
     //---------------------------------------------------------------------------------------------
     // CONSTRUCTORS.
     //---------------------------------------------------------------------------------------------
 
-    public BoundsPointQuery(Bounds bounds) {
-        this.bounds = bounds;
-    }
-
-    //---------------------------------------------------------------------------------------------
-    // GETTER AND SETTER.
-    //---------------------------------------------------------------------------------------------
-
-    public Bounds getBounds() {
-        return bounds;
-    }
-
-    public void setBounds(Bounds bounds) {
-        this.bounds = bounds;
+    public ApplicationAdapter(ApplicationFixture applicationFixture) {
+        this.applicationFixture = applicationFixture;
     }
 
     //---------------------------------------------------------------------------------------------
@@ -56,19 +43,21 @@ public class BoundsPointQuery extends PointQueryBase {
     //---------------------------------------------------------------------------------------------
 
     @Override
-    public Point2D query() {
-        Point2D point = pointAtPosition(this.bounds, this.getPosition());
-        Point2D offset = getOffset();
-        return new Point2D(point.getX() + offset.getX(), point.getY() + offset.getY());
+    public void init()
+              throws Exception {
+        applicationFixture.init();
     }
 
-    //---------------------------------------------------------------------------------------------
-    // PRIVATE METHODS.
-    //---------------------------------------------------------------------------------------------
+    @Override
+    public void start(Stage primaryStage)
+               throws Exception {
+        applicationFixture.start(primaryStage);
+    }
 
-    private Point2D pointAtPosition(Bounds bounds,
-                                    Point2D position) {
-        return PointQueryUtils.atPositionFactors(bounds, position);
+    @Override
+    public void stop()
+              throws Exception {
+        applicationFixture.stop();
     }
 
 }

@@ -16,9 +16,11 @@
  */
 package org.testfx.matcher.control;
 
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.layout.StackPane;
+import static org.hamcrest.MatcherAssert.assertThat;
+
+import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -28,11 +30,8 @@ import org.junit.rules.ExpectedException;
 import org.testfx.api.FxRobot;
 import org.testfx.api.FxToolkit;
 
-import static javafx.collections.FXCollections.observableArrayList;
-import static org.hamcrest.MatcherAssert.assertThat;
-
-public class ListViewMatchersTest extends FxRobot {
-
+public class TextFlowMatchersTest extends FxRobot
+{
     //---------------------------------------------------------------------------------------------
     // FIELDS.
     //---------------------------------------------------------------------------------------------
@@ -40,7 +39,8 @@ public class ListViewMatchersTest extends FxRobot {
     @Rule
     public ExpectedException exception = ExpectedException.none();
 
-    public ListView<String> listView;
+    public TextFlow textFlow;
+    public TextFlow exactTextFlow;
 
     //---------------------------------------------------------------------------------------------
     // FIXTURE METHODS.
@@ -53,13 +53,17 @@ public class ListViewMatchersTest extends FxRobot {
 
     @Before
     public void setup() throws Exception {
-        FxToolkit.setupSceneRoot(() -> {
-            listView = new ListView<>();
-            listView.setItems(observableArrayList("alice", "bob", "carol", "dave"));
-            listView.setPlaceholder(new Label("Empty!"));
-            return new StackPane(listView);
+        FxToolkit.setupFixture(() -> {
+            Text foobarText = new Text("foobar ");
+            Text quuxText = new Text("quux");
+            quuxText.setFill(Color.RED);
+            textFlow = new TextFlow(foobarText, quuxText);
+
+            Text exactText = new Text("exact");
+            // set the fill to the closest color to, but not exactly, LimeGreen (50, 205, 50)
+            exactText.setFill(Color.rgb(51, 205, 50));
+            exactTextFlow = new TextFlow(exactText);
         });
-        FxToolkit.showStage();
     }
 
     //---------------------------------------------------------------------------------------------
@@ -67,56 +71,43 @@ public class ListViewMatchersTest extends FxRobot {
     //---------------------------------------------------------------------------------------------
 
     @Test
-    public void hasListCell() {
+    public void hasText() {
         // expect:
-        assertThat(listView, ListViewMatchers.hasListCell("alice"));
+        assertThat(textFlow, TextFlowMatchers.hasText("foobar quux"));
     }
 
     @Test
-    public void hasListCell_with_null_fails() {
+    public void hasText_fails() {
         // expect:
         exception.expect(AssertionError.class);
-        exception.expectMessage("Expected: ListView has list cell \"null\"\n");
+        exception.expectMessage("Expected: TextFlow has text \"foobar baaz\"\n");
 
-        assertThat(listView, ListViewMatchers.hasListCell(null));
+        assertThat(textFlow, TextFlowMatchers.hasText("foobar baaz"));
     }
 
     @Test
-    public void hasListCell_fails() {
+    public void hasColoredText() {
+        assertThat(textFlow, TextFlowMatchers.hasColoredText("foobar <RED>quux</RED>"));
+    }
+
+    @Test
+    public void hasColoredText_fails() {
         // expect:
         exception.expect(AssertionError.class);
-        exception.expectMessage("Expected: ListView has list cell \"foobar\"\n");
+        exception.expectMessage("Expected: TextFlow has colored text " +
+                "\"foobar <BLUE>quux</BLUE>\"\n");
 
-        assertThat(listView, ListViewMatchers.hasListCell("foobar"));
+        assertThat(textFlow, TextFlowMatchers.hasColoredText("foobar <BLUE>quux</BLUE>"));
     }
 
     @Test
-    public void hasItems() {
-        // expect:
-        assertThat(listView, ListViewMatchers.hasItems(4));
-    }
-
-    @Test
-    public void hasItems_fails() {
+    public void hasExactlyColoredText_fails() {
         // expect:
         exception.expect(AssertionError.class);
-        exception.expectMessage("Expected: ListView has 0 items\n");
+        exception.expectMessage("Expected: TextFlow has exactly colored " +
+                "text \"<LIMEGREEN>exact</LIMEGREEN>\"\n");
 
-        assertThat(listView, ListViewMatchers.hasItems(0));
+        assertThat(exactTextFlow, TextFlowMatchers.hasExactlyColoredText("<LIMEGREEN>exact</LIMEGREEN>"));
     }
 
-    @Test
-    public void hasPlaceholder() {
-        // expect:
-        assertThat(listView, ListViewMatchers.hasPlaceholder(new Label("Empty!")));
-    }
-
-    @Test
-    public void hasPlaceholder_fails() {
-        // expect:
-        exception.expect(AssertionError.class);
-        exception.expectMessage("Expected: ListView has labeled placeholder containing text: \"foobar\"\n");
-
-        assertThat(listView, ListViewMatchers.hasPlaceholder(new Label("foobar")));
-    }
 }

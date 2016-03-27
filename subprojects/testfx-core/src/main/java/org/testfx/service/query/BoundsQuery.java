@@ -14,22 +14,12 @@
  * CONDITIONS OF ANY KIND, either express or implied. See the Licence for the
  * specific language governing permissions and limitations under the Licence.
  */
-package org.testfx.toolkit;
+package org.testfx.service.query;
 
-import java.util.concurrent.Callable;
-import java.util.concurrent.Future;
-import javafx.application.Application;
-import javafx.stage.Stage;
+import javafx.geometry.Bounds;
 
-public interface ApplicationService {
+public interface BoundsQuery {
 
-    Future<Application> create(Callable<Application> applicationCallable);
-
-    Future<Void> init(Application application);
-
-    Future<Void> start(Application application,
-                       Stage targetStage);
-
-    Future<Void> stop(Application application);
+    public Bounds query();
 
 }

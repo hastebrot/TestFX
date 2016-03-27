@@ -25,13 +25,13 @@ import javafx.stage.Window;
 import org.testfx.service.query.PointQuery;
 
 public interface PointLocator {
-    PointQuery pointFor(Bounds bounds);
+    PointQuery point(Bounds bounds);
 
-    PointQuery pointFor(Point2D point);
+    PointQuery point(Point2D point);
 
-    PointQuery pointFor(Node node);
+    PointQuery point(Node node);
 
-    PointQuery pointFor(Scene scene);
+    PointQuery point(Scene scene);
 
-    PointQuery pointFor(Window window);
+    PointQuery point(Window window);
 }

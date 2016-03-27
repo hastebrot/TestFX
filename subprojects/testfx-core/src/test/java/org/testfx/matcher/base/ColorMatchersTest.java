@@ -14,48 +14,42 @@
  * CONDITIONS OF ANY KIND, either express or implied. See the Licence for the
  * specific language governing permissions and limitations under the Licence.
  */
-package org.testfx.toolkit.impl;
+package org.testfx.matcher.base;
 
-import javafx.application.Application;
-import javafx.stage.Stage;
+import javafx.scene.paint.Color;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.testfx.api.FxRobot;
 
-import org.testfx.api.annotation.Unstable;
-import org.testfx.toolkit.ApplicationFixture;
+import static org.hamcrest.MatcherAssert.assertThat;
 
-@Unstable(reason = "needs more tests")
-public final class ApplicationAdapter implements ApplicationFixture {
-
-    //---------------------------------------------------------------------------------------------
-    // PRIVATE FIELDS.
-    //---------------------------------------------------------------------------------------------
-
-    private Application application;
+public class ColorMatchersTest extends FxRobot {
 
     //---------------------------------------------------------------------------------------------
-    // CONSTRUCTORS.
+    // FIELDS.
     //---------------------------------------------------------------------------------------------
 
-    public ApplicationAdapter(Application application) {
-        this.application = application;
+    @Rule
+    public ExpectedException exception = ExpectedException.none();
+
+    //---------------------------------------------------------------------------------------------
+    // FEATURE METHODS.
+    //---------------------------------------------------------------------------------------------
+
+    @Test
+    public void hasColor() {
+        // expect:
+        assertThat(Color.color(1, 0, 0), ColorMatchers.hasColor(Color.RED));
     }
 
-    //---------------------------------------------------------------------------------------------
-    // METHODS.
-    //---------------------------------------------------------------------------------------------
+    @Test
+    public void hasColor_fails() {
+        // expect:
+        exception.expect(AssertionError.class);
+        exception.expectMessage("Expected: Color has color (0x000000ff)\n");
 
-    @Override
-    public void init() throws Exception {
-        application.init();
-    }
-
-    @Override
-    public void start(Stage stage) throws Exception {
-        application.start(stage);
-    }
-
-    @Override
-    public void stop() throws Exception {
-        application.stop();
+        assertThat(Color.color(1, 0, 0), ColorMatchers.hasColor(Color.BLACK));
     }
 
 }
